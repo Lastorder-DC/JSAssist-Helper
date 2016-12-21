@@ -30,7 +30,8 @@ function checkTerror(string) {
     if (chkMessage.indexOf("h4") !== -1) filter = true;
     if (chkMessage.indexOf("h5") !== -1) filter = true;
     if (chkMessage.indexOf("h6") !== -1) filter = true;
-
+    // 아래로 if (chkMessage.indexOf("h6") !== -1) filter = true; 처럼 추가
+    
     return filter;
 }
 
