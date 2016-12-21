@@ -2,9 +2,8 @@ var addChatMessage2 = addChatMessage;
 
 addChatMessage = function (platform, nickname, message) {
     var filter = false;
-    // 닉네임검사
-    filter = checkTerror(nickname);
-    if (filter) nickname = htmlEntities(nickname);
+    // 닉네임 바꿈
+    nickname = htmlEntities(nickname);
 
     // 메세지검사
     filter = checkTerror(message);
