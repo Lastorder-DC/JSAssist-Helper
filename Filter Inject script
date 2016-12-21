@@ -1,0 +1,29 @@
+var addChatMessage2 = addChatMessage;
+
+addChatMessage = function(platform,nickname,message) {
+    var filter = false;
+
+    if(message.indexOf("script") !== -1) filter = true;
+    if(message.indexOf("style") !== -1) filter = true;
+    if(message.indexOf("iframe") !== -1) filter = true;
+    if(message.indexOf("embed") !== -1) filter = true;
+    if(message.indexOf("onerror") !== -1) filter = true;
+    if(message.indexOf("onload") !== -1) filter = true;
+    if(message.indexOf("font") !== -1) filter = true;
+    if(message.indexOf("h1") !== -1) filter = true;
+    if(message.indexOf("h2") !== -1) filter = true;
+    if(message.indexOf("h3") !== -1) filter = true;
+    if(message.indexOf("h4") !== -1) filter = true;
+    if(message.indexOf("h5") !== -1) filter = true;
+    if(message.indexOf("h6") !== -1) filter = true;
+
+    if(filter) message = htmlEntities(message);
+
+    //message.replace(/img http:\/\/.*/g,"test");
+
+    return addChatMessage2(platform,nickname,message);
+}
+
+function htmlEntities(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
