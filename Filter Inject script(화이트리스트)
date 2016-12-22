@@ -1,0 +1,17 @@
+var addChatMessage2 = addChatMessage;
+
+addChatMessage = function (platform, nickname, message) {
+    // 닉네임 바꿈
+    nickname = htmlEntities(nickname);
+
+    // 메세지 바꿈
+    message = htmlEntities(message);
+    message = message.replace(/\[img src="(.*)"\]/g,'<img src="$1" />');
+    message = message.replace(/\[marquee( direction=".*")?( behavior=".*")?( loop=".*")?( scrollamount=".*")?( scrolldelay=".*")?\](.*)\[\/marquee\]/g,'<marquee$1$2$3$4$5>$6</marquee>');
+
+    return addChatMessage2(platform, nickname, message);
+};
+
+function htmlEntities(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
