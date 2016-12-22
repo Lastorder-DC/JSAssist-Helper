@@ -8,6 +8,7 @@ addChatMessage = function (platform, nickname, message) {
     // 메세지검사
     filter = checkTerror(message);
     if (filter) message = htmlEntities(message);
+    message = message.replace(/\[dccon rct_([0-9]*)\]/g,"<img src=\"http://openrct2.lastorder.xyz/dccon/rctcon/icon_$1.gif\" />");
 
     return addChatMessage2(platform, nickname, message);
 }
