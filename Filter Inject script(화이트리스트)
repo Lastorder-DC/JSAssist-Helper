@@ -9,8 +9,8 @@ addChatMessage = function (platform, nickname, message) {
     message = message.replace(/\[img src="(.*)"\]/g,'<img src="$1" />');
     message = message.replace(/\[marquee( direction=".*")?( behavior=".*")?( loop=".*")?( scrollamount=".*")?( scrolldelay=".*")?\](.*)\[\/marquee\]/g,'<marquee$1$2$3$4$5>$6</marquee>');
     message = message.replace(/\[b\](.*)/g,'<b>$1</b>'); //볼드 [b]blah
-    message = message.replace(/\[i\](.*)/g,'<b>$1</b>'); //이탤릭 [i]blah
-    message = message.replace(/\[s\](.*)/g,'<b>$1</b>'); //취소선 [s]blah
+    message = message.replace(/\[i\](.*)/g,'<i>$1</i>'); //이탤릭 [i]blah
+    message = message.replace(/\[s\](.*)/g,'<strike>$1</strike>'); //취소선 [s]blah
 
     return addChatMessage2(platform, nickname, message);
 };
