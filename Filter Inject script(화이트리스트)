@@ -5,8 +5,14 @@ addChatMessage = function (platform, nickname, message) {
     // 채팅수 세기 추가 시작
     if(typeof window.chatcount == "undefined") window.chatcount = 1;
     window.chatcount++;
-    if(window.chatcount > 500) location.reload(); // 500개 채팅 이후 새로고침함(숫자 바꾸면 늘릴수있음)
+    
+    // 500개 채팅 이후 새로고침함(숫자 바꾸면 늘릴수있음)
+    if(window.chatcount > 500) {
+        window.chatcount = 0;
+        location.reload();
+    }
     // 채팅수 세기 추가 끝
+    
     // 닉네임 바꿈
     nickname = htmlEntities(nickname);
 
