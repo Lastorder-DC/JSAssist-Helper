@@ -1,37 +1,56 @@
 var addChatMessage2 = addChatMessage;
+window.config = {};
+window.config.autoReset = false; //자동리셋 사용하려면 true로 변경
+window.config.maxChatCount = 500; //최대 채팅수. 이보다 넘겼을때 자동리셋이 켜져있다면 새로고침됨
+window.config.allowExternalSource = false; //외부이미지([img 주소] 문법) 허용하려면 true로 변경
+window.config.allowDCCon = true; //디시콘 사용가능유무 사용금지로 바꾸려면 false로 설정
 
 addChatMessage = function (platform, nickname, message) {
-
     // 채팅수 세기 추가 시작
-    if(typeof window.chatcount == "undefined") window.chatcount = 1;
-    window.chatcount++;
-    
-    // 500개 채팅 이후 새로고침함(숫자 바꾸면 늘릴수있음)
-    if(window.chatcount > 500) {
-        window.chatcount = 0;
-        location.reload();
+    if(window.config.autoReset) {
+        if(typeof window.chatcount == "undefined") window.chatcount = 1;
+        window.chatcount++;
+
+        // 500개 채팅 이후 새로고침함(숫자 바꾸면 늘릴수있음)
+        if(window.chatcount > window.config.maxChatCount) {
+            window.chatcount = 0;
+            location.reload();
+        }
     }
+
     // 채팅수 세기 추가 끝
-    
-    // 닉네임 바꿈
+
+    // 닉네임 HTML 제거
     nickname = htmlEntities(nickname);
 
-    // 메세지 바꿈
+    // 메세지 HTML 제거
     message = htmlEntities(message);
-    message = message.replace(/\[dccon rct_([0-9]*)\]/g,"<img src=\"http://openrct2.lastorder.xyz/dccon/rctcon/icon_$1.gif\" />");
+
+    // 메세지 안 디시콘 변환(시동어 / . ~ 입력후 디시콘이름 입력하면 됨)
+    if(window.config.allowDCCon) message = message.replace(/[\/\.~]([^\ ]*)/g,replaceDCCon);
+
+    //기본문법 변환(추후 분리예정)
     message = message.replace(/\[img ([^\]\"]*)\]/g,"<img src=\"$1\" />");
     message = message.replace(/\[marquee( direction=[^\ ]*)?( behavior=[^\ ]*)?( loop=[^\ ]*)?( scrollamount=[^\ ]*)?( scrolldelay=[^\ ]*)?\](.*)\[\/marquee\]/g,'<marquee$1$2$3$4$5>$6</marquee>');
     message = message.replace(/\[mq( direction=[^\ ]*)?( behavior=[^\ ]*)?( loop=[^\ ]*)?( scrollamount=[^\ ]*)?( scrolldelay=[^\ ]*)?\](.*)\[\/mq\]/g,'<marquee$1$2$3$4$5>$6</marquee>');
     message = message.replace(/\[b\](.*)\[\/b\]/g,"<b>$1</b>"); //볼드 [b]blah[/b]
     message = message.replace(/\[i\](.*)\[\/i\]/g,"<i>$1</i>"); //이탤릭 [i]blah[/i]
     message = message.replace(/\[s\](.*)\[\/s\]/g,"<strike>$1</strike>"); //취소선 [s]blahp[/s]
-    
+
     message = message.replace(/\[b\](.*)/g,"<b>$1</b>"); //볼드 [b]blah
     message = message.replace(/\[i\](.*)/g,"<i>$1</i>"); //이탤릭 [i]blah
     message = message.replace(/\[s\](.*)/g,"<strike>$1</strike>"); //취소선 [s]blah
 
     return addChatMessage2(platform, nickname, message);
 };
+
+function replaceDCCon(match,dcconkey,offset) {
+    var dcconimage = {행복2: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_1.gif",
+    행복1: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_2.gif"};
+
+    if(typeof dcconimage[dcconkey] == "undefined") return match;
+    else return "<img src=\"" + dcconimage[dcconkey] + "\" >";
+}
 
 function htmlEntities(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
