@@ -26,7 +26,7 @@ addChatMessage = function (platform, nickname, message) {
     // 메세지 HTML 제거
     message = htmlEntities(message);
 
-    // 메세지 안 디시콘 변환(시동어 / . ~ 입력후 디시콘이름 입력하면 됨)
+    // 메세지 안 디시콘 변환(시동어 / . ~ 입력후 등록한 이모티콘 이름 입력하면 됨)
     if(window.config.allowDCCon) message = message.replace(/[\/\.~]([^\ \/\.~]*)/g,replaceDCCon);
 
     //기본문법 변환(추후 분리예정)
