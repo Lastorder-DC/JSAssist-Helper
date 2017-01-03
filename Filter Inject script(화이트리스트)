@@ -31,11 +31,11 @@ addChatMessage = function (platform, nickname, message) {
 
     //기본문법 변환(추후 분리예정)
     message = message.replace(/\[img ([^\]\"]*)\]/g,"<img src=\"$1\" />");
-    message = message.replace(/\[mq( direction=[^\ ]*)?( behavior=[^\ ]*)?( loop=[^\ ]*)?( scrollamount=[^\ ]*)?( scrolldelay=[^\ ]*)?\](.*)\[\/mq\]/g,'<marquee$1$2$3$4$5>$6</marquee>');
+    message = message.replace(/\[mq( direction=[^\ ]*)?( behavior=[^\ ]*)?( loop=[^\ ]*)?( scrollamount=[^\ ]*)?( scrolldelay=[^\ ]*)?\](.*)\[\/mq\]/g,replaceMarquee);
     message = message.replace(/\[b\](.*)\[\/b\]/g,"<b>$1</b>"); //볼드 [b]blah[/b]
     message = message.replace(/\[i\](.*)\[\/i\]/g,"<i>$1</i>"); //이탤릭 [i]blah[/i]
     message = message.replace(/\[s\](.*)\[\/s\]/g,"<strike>$1</strike>"); //취소선 [s]blahp[/s]
-    
+
     // 나무위키식
     message = message.replace(/'''(.*)'''/g,"<b>$1</b>");
     message = message.replace(/''(.*)''/g,"<i>$1</i>");
@@ -50,10 +50,29 @@ addChatMessage = function (platform, nickname, message) {
     return addChatMessage2(platform, nickname, message);
 };
 
+function replaceMarquee(match,direction,behavior,loop,scrollamount,scrolldelay,body,offset) {
+    //빈 값 확인
+    if(typeof direction == "undefined") direction = "";
+    if(typeof behavior == "undefined") behavior = "";
+    if(typeof loop == "undefined") loop = "";
+    if(typeof scrollamount == "undefined") scrollamount = "";
+    if(typeof scrolldelay == "undefined") scrolldelay = "";
+
+    //내용이 빈 mq 태그는 무의미하므로 리턴
+    if(typeof body == "undefined") return "";
+
+    var scrollamount_value = scrollamount.replace(/[^0-9]/g,"");
+
+    //scrollamount 값을 50 이하로 제한함(50이 넘으면 50으로 강제 하향조정)
+    if(scrollamount_value > 50) scrollamount = ' scrollamount=50';
+    return '<marquee' + direction + behavior + loop + scrollamount + scrolldelay + '>' + body + '</marquee>';
+}
+
 function replaceDCCon(match,dcconkey,offset) {
     var dcconimage = {행복2: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_1.gif",
-    행복1: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_2.gif"};
+        행복1: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_2.gif"};
 
+    //디시콘이 없다면 그냥 반환함
     if(typeof dcconimage[dcconkey] == "undefined") return match;
     else return "<img src=\"" + dcconimage[dcconkey] + "\" >";
 }
