@@ -1,12 +1,19 @@
+//기존 채팅 함수 이름을 바꾼다
 var addChatMessage2 = addChatMessage;
+
+//설정 변수 선언
 window.config = {};
 window.config.autoReset = false; //자동리셋 사용하려면 true로 변경
 window.config.maxChatCount = 500; //최대 채팅수. 이보다 넘겼을때 자동리셋이 켜져있다면 새로고침됨
 window.config.allowExternalSource = false; //외부이미지([img 주소] 문법) 허용하려면 true로 변경
 window.config.allowDCCon = true; //디시콘 사용가능유무 사용금지로 바꾸려면 false로 설정
 
+//새로 만들 채팅 함수
+//닉네임, 채팅에 적절한 처리를 거친 뒤 원본 채팅함수로 보낸다
+//JSAssist가 패치되어 HTML을 거부하게 되면 원본 채팅함수도 후킹해야함
 addChatMessage = function (platform, nickname, message) {
-    // 채팅수 세기 추가 시작
+
+    //자동 새로고침
     if(window.config.autoReset) {
         if(typeof window.chatcount == "undefined") window.chatcount = 1;
         window.chatcount++;
@@ -18,8 +25,6 @@ addChatMessage = function (platform, nickname, message) {
         }
     }
 
-    // 채팅수 세기 추가 끝
-
     // 닉네임 HTML 제거
     nickname = htmlEntities(nickname);
 
@@ -29,9 +34,20 @@ addChatMessage = function (platform, nickname, message) {
     // 메세지 안 디시콘 변환(시동어 / . ~ 입력후 등록한 이모티콘 이름 입력하면 됨)
     if(window.config.allowDCCon) message = message.replace(/[\/\.~]([^\ \/\.~]*)/g,replaceDCCon);
 
-    //기본문법 변환(추후 분리예정)
-    if(window.config.allowExternalSource) message = message.replace(/\[img ([^\]\"]*)\]/g,"<img src=\"$1\" />");
+    // marquee 태그 변환
     message = message.replace(/\[mq( direction=[^\ ]*)?( behavior=[^\ ]*)?( loop=[^\ ]*)?( scrollamount=[^\ ]*)?( scrolldelay=[^\ ]*)?\](.*)\[\/mq\]/g,replaceMarquee);
+
+    //기본문법 변환
+    message = replaceStyle(message);
+
+    return addChatMessage2(platform, nickname, message);
+};
+
+function replaceStyle(message) {
+    //외부 이미지 문법(기본 비활성화 상태로 상단 설정변수를 true로 바꿔 활성화 가능)
+    if(window.config.allowExternalSource) message = message.replace(/\[img ([^\]\"]*)\]/g,"<img src=\"$1\" />");
+
+    //닫는태그가 지정된 [b][i][s]
     message = message.replace(/\[b\](.*)\[\/b\]/g,"<b>$1</b>"); //볼드 [b]blah[/b]
     message = message.replace(/\[i\](.*)\[\/i\]/g,"<i>$1</i>"); //이탤릭 [i]blah[/i]
     message = message.replace(/\[s\](.*)\[\/s\]/g,"<strike>$1</strike>"); //취소선 [s]blahp[/s]
@@ -43,12 +59,13 @@ addChatMessage = function (platform, nickname, message) {
     message = message.replace(/--(.*)--/g,"<strike>$1</strike>");
     message = message.replace(/__(.*)__/g,"<u>$1</u>");
 
+    //닫는 태그가 없는 [b][i][s]
     message = message.replace(/\[b\](.*)/g,"<b>$1</b>"); //볼드 [b]blah
     message = message.replace(/\[i\](.*)/g,"<i>$1</i>"); //이탤릭 [i]blah
     message = message.replace(/\[s\](.*)/g,"<strike>$1</strike>"); //취소선 [s]blah
 
-    return addChatMessage2(platform, nickname, message);
-};
+    return message;
+}
 
 function replaceMarquee(match,direction,behavior,loop,scrollamount,scrolldelay,body,offset) {
     //빈 값 확인
