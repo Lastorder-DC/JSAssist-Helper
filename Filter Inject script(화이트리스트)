@@ -30,7 +30,7 @@ addChatMessage = function (platform, nickname, message) {
     if(window.config.allowDCCon) message = message.replace(/[\/\.~]([^\ \/\.~]*)/g,replaceDCCon);
 
     //기본문법 변환(추후 분리예정)
-    message = message.replace(/\[img ([^\]\"]*)\]/g,"<img src=\"$1\" />");
+    if(window.config.allowExternalSource) message = message.replace(/\[img ([^\]\"]*)\]/g,"<img src=\"$1\" />");
     message = message.replace(/\[mq( direction=[^\ ]*)?( behavior=[^\ ]*)?( loop=[^\ ]*)?( scrollamount=[^\ ]*)?( scrolldelay=[^\ ]*)?\](.*)\[\/mq\]/g,replaceMarquee);
     message = message.replace(/\[b\](.*)\[\/b\]/g,"<b>$1</b>"); //볼드 [b]blah[/b]
     message = message.replace(/\[i\](.*)\[\/i\]/g,"<i>$1</i>"); //이탤릭 [i]blah[/i]
