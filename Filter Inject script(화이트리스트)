@@ -1,12 +1,51 @@
-//기존 채팅 함수 이름을 바꾼다
-var addChatMessage2 = addChatMessage;
-
 //설정 변수 선언
 window.config = {};
+window.config.allowTag = true; // 이미지, 스타일, 디시콘등 허용여부. 금지하려면(JSAssist build 17.1 이상 기본설정) false로 변경
 window.config.autoReset = false; //자동리셋 사용하려면 true로 변경
 window.config.maxChatCount = 500; //최대 채팅수. 이보다 넘겼을때 자동리셋이 켜져있다면 새로고침됨
 window.config.allowExternalSource = false; //외부이미지([img 주소] 문법) 허용하려면 true로 변경
 window.config.allowDCCon = true; //디시콘 사용가능유무 사용금지로 바꾸려면 false로 설정
+
+// JSAssist 패치되서 HTML 선택허용 되면 아래 함수는 지워도됨
+function addChatMessage2(platform, nickname, message) {
+    var style = "style='display:none; '";
+    var stylePlatform = "chat_platform_";
+    if (platformIcon) {
+        stylePlatform += platform;
+    } else {
+        stylePlatform += "none";
+    }
+    var chatNickname;
+    var msg = "";
+    var chatMessage;
+    var $chatElement;
+
+    chatNickname = "<span class='" + stylePlatform + "'" + style + "/><span class='chat_text_nickname' style='display:none'>" + nickname + "</span>";
+    if(window.config.allowTag) msg = $("<div>" + message + "</div>").html();
+    else  msg = $("<div>" + message + "</div>").text();
+    chatMessage = "<div class='chat_text_message' style='display:none'>" + msg + "</div>";
+    $chatElement = $(chatNickname + chatMessage + "</div>");
+
+    $chatElement.appendTo($(".chat_container"));
+    updateStyle();
+    if (animation == "none") {
+        $chatElement.show();
+    } else {
+        $chatElement.show(animation, {easing: "easeOutQuint", direction: "down"});
+    }
+    if (chatFade != 0) {
+        var fadeTime = chatFade * 1000;
+        if (animation == "none") {
+            $chatElement.delay(fadeTime).hide(0, function () {
+                $(this).remove();
+            });
+        } else {
+            $chatElement.delay(fadeTime).hide(animation, 1000, function () {
+                $(this).remove();
+            });
+        }
+    }
+}
 
 //새로 만들 채팅 함수
 //닉네임, 채팅에 적절한 처리를 거친 뒤 원본 채팅함수로 보낸다
@@ -32,7 +71,7 @@ addChatMessage = function (platform, nickname, message) {
     message = htmlEntities(message);
 
     // 메세지 안 디시콘 변환(시동어 / . ~ 입력후 등록한 이모티콘 이름 입력하면 됨)
-    if(window.config.allowDCCon) message = message.replace(/[\/\.~]([^\ \/\.\[\]~]*)/g,replaceDCCon);
+    if(window.config.allowDCCon) message = message.replace(/[\/\.~]([^\ \/\.~]*)/g,replaceDCCon);
 
     // marquee 태그 변환
     message = message.replace(/\[mq( direction=[^\ ]*)?( behavior=[^\ ]*)?( loop=[^\ ]*)?( scrollamount=[^\ ]*)?( scrolldelay=[^\ ]*)?\](.*)\[\/mq\]/g,replaceMarquee);
