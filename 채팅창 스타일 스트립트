@@ -1,10 +1,14 @@
 //설정 변수 선언
 window.config = {};
 window.config.allowTag = true; // 이미지, 스타일, 디시콘등 허용여부. 금지하려면(JSAssist build 17.1 이상 기본설정) false로 변경
-window.config.autoReset = false; //자동리셋 사용하려면 true로 변경
-window.config.maxChatCount = 500; //최대 채팅수. 이보다 넘겼을때 자동리셋이 켜져있다면 새로고침됨
+window.config.autoReset = true; //자동리셋 사용하려면 true로 변경
 window.config.allowExternalSource = false; //외부이미지([img 주소] 문법) 허용하려면 true로 변경
 window.config.allowDCCon = true; //디시콘 사용가능유무 사용금지로 바꾸려면 false로 설정
+
+//채팅수 관련 설정
+window.chat = {};
+window.chat.count = 0;
+window.chat.maxcount = 50;
 
 // JSAssist 패치되서 HTML 선택허용 되면 아래 함수는 지워도됨
 function addChatMessage2(platform, nickname, message) {
@@ -33,16 +37,28 @@ function addChatMessage2(platform, nickname, message) {
     } else {
         $chatElement.show(animation, {easing: "easeOutQuint", direction: "down"});
     }
+    
+    window.chat.count++;
     if (chatFade != 0) {
         var fadeTime = chatFade * 1000;
         if (animation == "none") {
             $chatElement.delay(fadeTime).hide(0, function () {
                 $(this).remove();
+                window.chat.count--;
             });
         } else {
             $chatElement.delay(fadeTime).hide(animation, 1000, function () {
                 $(this).remove();
+                window.chat.count--;
             });
+        }
+    } else {
+        if (window.chat.count > window.chat.maxcount) {
+            window.chat.count--;
+            $remove_temp = $(".chat_container span:first-child");
+            $remove_temp.next().remove();
+            $remove_temp.next().remove();
+            $remove_temp.remove();
         }
     }
 }
@@ -51,19 +67,6 @@ function addChatMessage2(platform, nickname, message) {
 //닉네임, 채팅에 적절한 처리를 거친 뒤 원본 채팅함수로 보낸다
 //JSAssist가 패치되어 HTML을 거부하게 되면 원본 채팅함수도 후킹해야함
 addChatMessage = function (platform, nickname, message) {
-
-    //자동 새로고침
-    if(window.config.autoReset) {
-        if(typeof window.chatcount == "undefined") window.chatcount = 1;
-        window.chatcount++;
-
-        // 500개 채팅 이후 새로고침함(숫자 바꾸면 늘릴수있음)
-        if(window.chatcount > window.config.maxChatCount) {
-            window.chatcount = 0;
-            location.reload();
-        }
-    }
-
     // 닉네임 HTML 제거
     nickname = htmlEntities(nickname);
 
