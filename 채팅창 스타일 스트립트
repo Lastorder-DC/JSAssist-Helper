@@ -10,6 +10,72 @@ window.chat = {};
 window.chat.count = 0;
 window.chat.maxcount = 50;
 
+function replaceQuote(match, message, offset, string) {
+    return '"message" : "' + message.replace('"',"\\\"") + '", "type"';
+}
+
+function FixJSAssistBug(json_string) {
+    // 트위치에서 이모티콘 입력시 앞뒤로 붙는 쓸데없는 것을 이모티콘 시동어로 적절히 바꿔준다
+    // 이모티콘으로 트위치 이모티콘 영문명을 추가해주면 잘 동작함
+    json_string = json_string.replace(decodeURIComponent("%20%20%20%20%0D%0A"),"~");
+    json_string = json_string.replace(decodeURIComponent("%0D%0A"),"");
+    
+    // JSAssist에서 " 들어간 채팅을 부적절하게 처리해 발생하는 문제 수정
+    json_string = json_string.replace(/"message" : "((.|[\r\n])*)", "type"/,replaceQuote);
+
+    console.log(json_string);
+
+    return json_string;
+}
+
+// 채팅창 연결 스크립트 Lastorder-DC 버전
+// 트위치에서 쓸데없이 보내주는 줄바꿈 문자를 적당히 바꿔줌
+is_connected_lastorder = false;
+is_init_oldver_lastorder = false;
+function connect_jsassist_lastorder() {
+    var ws = new WebSocket("ws://localhost:4649/JSAssistChatServer");
+    ws.onopen = function () {
+        is_connected_lastorder = true;
+    };
+    ws.onmessage = function (evt) {
+        var data = JSON.parse(FixJSAssistBug(evt.data));
+        if (data.type == "chat_message") {
+            if (platform != "all") {
+                if (platform != data.platform) {
+                    return;
+                }
+            }
+            addChatMessage_lastorder(data.platform, data.username, data.message);
+        } else if (data.type == "config") {
+            setConfig(data);
+        } else {
+            if (data.type == undefined) {
+                if (is_init_oldver_lastorder == false) {
+                    platformIcon = true;
+                    platform = "all";
+                    animation = "fade";
+                    chatFade = chat_fade;
+                    font = "Jeju Gothic";
+                    fontUsernameSize = 14;
+                    fontUsernameColor = "255, 255, 255";
+                    fontChatSize = 16;
+                    fontChatColor = "255, 255, 255";
+                    backgroundColor = "255, 255, 255";
+                    backgroundAlpha = 0;
+                    chatBackgroundColor = "255, 255, 255";
+                    chatBackgroundAlpha = 0.25;
+                    is_init_oldver_lastorder = true;
+                }
+                addChatMessage(data.platform, data.username, data.message);
+            }
+        }
+    };
+    ws.onclose = function () {
+        is_connected_lastorder = false;
+        setTimeout(connect_jsassist, 1000);
+    };
+}
+
 // JSAssist 패치되서 HTML 선택허용 되면 아래 함수는 지워도됨
 function addChatMessage2(platform, nickname, message) {
     var style = "style='display:none; '";
@@ -37,7 +103,7 @@ function addChatMessage2(platform, nickname, message) {
     } else {
         $chatElement.show(animation, {easing: "easeOutQuint", direction: "down"});
     }
-    
+
     window.chat.count++;
     if (chatFade != 0) {
         var fadeTime = chatFade * 1000;
@@ -63,10 +129,11 @@ function addChatMessage2(platform, nickname, message) {
     }
 }
 
+addChatMessage = function(){};
+
 //새로 만들 채팅 함수
 //닉네임, 채팅에 적절한 처리를 거친 뒤 원본 채팅함수로 보낸다
-//JSAssist가 패치되어 HTML을 거부하게 되면 원본 채팅함수도 후킹해야함
-addChatMessage = function (platform, nickname, message) {
+function addChatMessage_lastorder(platform, nickname, message) {
     // 닉네임 HTML 제거
     nickname = htmlEntities(nickname);
 
@@ -128,8 +195,10 @@ function replaceMarquee(match,direction,behavior,loop,scrollamount,scrolldelay,b
 }
 
 function replaceDCCon(match,dcconkey,offset) {
+    //https://static-cdn.jtvnw.net/emoticons/v1/145315/1.0
     var dcconimage = {행복2: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_1.gif",
-        행복1: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_2.gif"};
+        행복1: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_2.gif",
+        TheIlluminati: "https://static-cdn.jtvnw.net/emoticons/v1/145315/1.0"};
 
     //디시콘이 없다면 그냥 반환함
     if(typeof dcconimage[dcconkey] == "undefined") return match;
@@ -139,3 +208,5 @@ function replaceDCCon(match,dcconkey,offset) {
 function htmlEntities(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+
+connect_jsassist_lastorder();
