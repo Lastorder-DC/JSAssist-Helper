@@ -23,8 +23,6 @@ function FixJSAssistBug(json_string) {
     // JSAssist에서 " 들어간 채팅을 부적절하게 처리해 발생하는 문제 수정
     json_string = json_string.replace(/"message" : "((.|[\r\n])*)", "type"/,replaceQuote);
 
-    console.log(json_string);
-
     return json_string;
 }
 
