@@ -3,7 +3,8 @@ window.config = {};
 window.config.allowTag = true; // 이미지, 스타일, 디시콘등 허용여부. 금지하려면(JSAssist build 17.1 이상 기본설정) false로 변경
 window.config.autoReset = false; // [사용안함] 자동리셋 설정 더이상 사용안함
 window.config.allowExternalSource = false; //외부이미지([img 주소] 문법) 허용하려면 true로 변경
-window.config.allowDCCon = true; //디시콘 사용가능유무 사용금지로 바꾸려면 false로 설정
+window.config.allowDCCon = true; //디시콘 사용가능유무 사용금지로 바꾸려면 false로 변경
+window.config.deleteDCConinsideMQ = true; // 마퀴태그안 디시콘 삭제여부 삭제 안하려면 false로 변경
 
 //채팅수 관련 설정
 window.chat = {};
@@ -73,11 +74,11 @@ addChatMessage = function (platform, nickname, message) {
     // 메세지 HTML 제거
     message = htmlEntities(message);
 
-    // 메세지 안 디시콘 변환(시동어 ~ 입력후 등록한 이모티콘 이름 입력하면 됨)
-    if(window.config.allowDCCon) message = message.replace(/~([^\ ~]*)/g,replaceDCCon);
-
     // marquee 태그 변환
     message = message.replace(/\[mq( direction=[^\ ]*)?( behavior=[^\ ]*)?( loop=[^\ ]*)?( scrollamount=[^\ ]*)?( scrolldelay=[^\ ]*)?\](.*)\[\/mq\]/g,replaceMarquee);
+	
+    // 메세지 안 디시콘 변환(시동어 ~ 입력후 등록한 이모티콘 이름 입력하면 됨)
+    if(window.config.allowDCCon) message = message.replace(/~([^\ ~]*)/g,replaceDCCon);
 
     //기본문법 변환
     message = replaceStyle(message);
@@ -124,7 +125,15 @@ function replaceMarquee(match,direction,behavior,loop,scrollamount,scrolldelay,b
 
     //scrollamount 값을 50 이하로 제한함(50이 넘으면 50으로 강제 하향조정)
     if(scrollamount_value > 50) scrollamount = ' scrollamount=50';
+	
+	// 마퀴태그내 디시콘 삭제 옵션 켜져있으면 변환 안되게 ~랑 디시콘 이름 사이 빈칸 띄움
+	if(window.config.deleteDCConinsideMQ) body = body.replace(/~([^\ ~]*)/g,deleteDCCon);
+	
     return '<marquee' + direction + behavior + loop + scrollamount + scrolldelay + '>' + body + '</marquee>';
+}
+
+function deleteDCCon(match,dcconkey,offset) {
+	return "~ " . dcconkey;
 }
 
 function replaceDCCon(match,dcconkey,offset) {
