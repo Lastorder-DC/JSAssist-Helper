@@ -4,7 +4,7 @@ window.config.allowTag = true; // 이미지, 스타일, 디시콘등 허용여�
 window.config.autoReset = false; // [사용안함] 자동리셋 설정 더이상 사용안함
 window.config.allowExternalSource = false; //외부이미지([img 주소] 문법) 허용하려면 true로 변경
 window.config.allowDCCon = true; //디시콘 사용가능유무 사용금지로 바꾸려면 false로 변경
-window.config.deleteDCConinsideMQ = true; // 마퀴태그안 디시콘 삭제여부 삭제 안하려면 false로 변경
+window.config.ignoreMQDCCon = true; // 마퀴태그+디시콘 사용여부 사용하려면 false로 변경
 
 //채팅수 관련 설정
 window.chat = {};
@@ -126,19 +126,15 @@ function replaceMarquee(match,direction,behavior,loop,scrollamount,scrolldelay,b
     //scrollamount 값을 50 이하로 제한함(50이 넘으면 50으로 강제 하향조정)
     if(scrollamount_value > 50) scrollamount = ' scrollamount=50';
 	
-	// 마퀴태그내 디시콘 삭제 옵션 켜져있으면 변환 안되게 ~랑 디시콘 이름 사이 빈칸 띄움
-	if(window.config.deleteDCConinsideMQ) body = body.replace(/~([^\ ~]*)/g,deleteDCCon);
+    // 마퀴태그내 디시콘이 오면 마퀴태그 무시함
+    if(window.config.ignoreMQDCCon) return body;
 	
     return '<marquee' + direction + behavior + loop + scrollamount + scrolldelay + '>' + body + '</marquee>';
 }
 
-function deleteDCCon(match,dcconkey,offset) {
-	return "~ " . dcconkey;
-}
-
 function replaceDCCon(match,dcconkey,offset) {
     var dcconimage = {행복2: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_1.gif",
-        행복1: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_2.gif"};
+    행복1: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_2.gif"};
 
     //디시콘이 없다면 그냥 반환함
     if(typeof dcconimage[dcconkey] == "undefined") return match;
