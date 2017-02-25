@@ -127,7 +127,7 @@ function replaceMarquee(match,direction,behavior,loop,scrollamount,scrolldelay,b
     if(scrollamount_value > 50) scrollamount = ' scrollamount=50';
 	
     // 마퀴태그내 디시콘이 오면 마퀴태그 무시함
-    if(window.config.ignoreMQDCCon) return body;
+    if(window.config.ignoreMQDCCon && message.match(/~([^\ ~]*)/g)) return body;
 	
     return '<marquee' + direction + behavior + loop + scrollamount + scrolldelay + '>' + body + '</marquee>';
 }
