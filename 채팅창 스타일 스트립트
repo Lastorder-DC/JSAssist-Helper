@@ -127,7 +127,7 @@ function replaceMarquee(match,direction,behavior,loop,scrollamount,scrolldelay,b
     if(scrollamount_value > 50) scrollamount = ' scrollamount=50';
 
     // 마퀴태그내 디시콘이 오면 마퀴태그를 무시함
-    if(window.config.ignoreMQDCCon) {
+    if(window.config.allowDCCon && window.config.ignoreMQDCCon) {
         // 우선 마퀴태그 내 디시콘을 변환해봄
         body = body.replace(/~([^\ ~]*)/g,replaceDCCon);
         // 디시콘이 있다면 그냥 마퀴태그 없이 변환된 디시콘 이미지만 반환
