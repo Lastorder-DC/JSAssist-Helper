@@ -38,7 +38,7 @@ function addChatMessage2(platform, nickname, message) {
     } else {
         $chatElement.show(animation, {easing: "easeOutQuint", direction: "down"});
     }
-    
+
     window.chat.count++;
     if (chatFade != 0) {
         var fadeTime = chatFade * 1000;
@@ -76,7 +76,7 @@ addChatMessage = function (platform, nickname, message) {
 
     // marquee 태그 변환
     message = message.replace(/\[mq( direction=[^\ ]*)?( behavior=[^\ ]*)?( loop=[^\ ]*)?( scrollamount=[^\ ]*)?( scrolldelay=[^\ ]*)?\](.*)\[\/mq\]/g,replaceMarquee);
-	
+
     // 메세지 안 디시콘 변환(시동어 ~ 입력후 등록한 이모티콘 이름 입력하면 됨)
     if(window.config.allowDCCon) message = message.replace(/~([^\ ~]*)/g,replaceDCCon);
 
@@ -111,36 +111,44 @@ function replaceStyle(message) {
 }
 
 function replaceMarquee(match,direction,behavior,loop,scrollamount,scrolldelay,body,offset) {
-    //빈 값 확인
+    // 빈 값 확인
     if(typeof direction == "undefined") direction = "";
     if(typeof behavior == "undefined") behavior = "";
     if(typeof loop == "undefined") loop = "";
     if(typeof scrollamount == "undefined") scrollamount = "";
     if(typeof scrolldelay == "undefined") scrolldelay = "";
 
-    //내용이 빈 mq 태그는 무의미하므로 리턴
+    // 내용이 빈 mq 태그는 무의미하므로 리턴
     if(typeof body == "undefined") return "";
 
     var scrollamount_value = scrollamount.replace(/[^0-9]/g,"");
 
-    //scrollamount 값을 50 이하로 제한함(50이 넘으면 50으로 강제 하향조정)
+    // scrollamount 값을 50 이하로 제한함(50이 넘으면 50으로 강제 하향조정)
     if(scrollamount_value > 50) scrollamount = ' scrollamount=50';
-	
-    // 마퀴태그내 디시콘이 오면 마퀴태그 무시함
-    if(window.config.ignoreMQDCCon && (body.match(/~([^\ ~]*)/g) != null)) return body;
-	
+
+    // 마퀴태그내 디시콘이 오면 마퀴태그를 무시함
+    if(window.config.ignoreMQDCCon) {
+        // 우선 마퀴태그 내 디시콘을 변환해봄
+        body = body.replace(/~([^\ ~]*)/g,replaceDCCon);
+        // 디시콘이 있다면 그냥 마퀴태그 없이 변환된 디시콘 이미지만 반환
+        if(body.match(/<img/) != null) return body;
+    }
+
+    // 마퀴태그 만들어 반환
     return '<marquee' + direction + behavior + loop + scrollamount + scrolldelay + '>' + body + '</marquee>';
 }
 
+// 디시콘 변환 함수
 function replaceDCCon(match,dcconkey,offset) {
     var dcconimage = {행복2: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_1.gif",
-    행복1: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_2.gif"};
+        행복1: "http://openrct2.lastorder.xyz/dccon/rctcon/icon_2.gif"};
 
     //디시콘이 없다면 그냥 반환함
     if(typeof dcconimage[dcconkey] == "undefined") return match;
     else return "<img src=\"" + dcconimage[dcconkey] + "\" >";
 }
 
+// HTML 필터링
 function htmlEntities(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
