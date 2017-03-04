@@ -195,7 +195,7 @@ function LoadDCCon() {
 	if (httpRequest.readyState === 4) {
 		if (httpRequest.status === 200) {
 			try {
-				window.DCCon = JSON.parse(httpRequest.responseText.replace("\n",""));
+				window.DCCon = JSON.parse(httpRequest.responseText);
 				window.isInited = true;
 			}
 			catch (e) {
