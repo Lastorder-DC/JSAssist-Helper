@@ -81,17 +81,17 @@ addChatMessage = function (platform, nickname, message) {
     // 메세지 HTML 제거
     message = htmlEntities(message);
 
-	// 스크립트 초기화 전에는 기본적인 HTML 필터링만 함
-	if(window.isInited) {
-		// marquee 태그 변환
-		message = message.replace(/\[mq( direction=[^\ ]*)?( behavior=[^\ ]*)?( loop=[^\ ]*)?( scrollamount=[^\ ]*)?( scrolldelay=[^\ ]*)?\](.*)\[\/mq\]/g,replaceMarquee);
+    // 스크립트 초기화 전에는 기본적인 HTML 필터링만 함
+    if(window.isInited) {
+        // marquee 태그 변환
+        message = message.replace(/\[mq( direction=[^\ ]*)?( behavior=[^\ ]*)?( loop=[^\ ]*)?( scrollamount=[^\ ]*)?( scrolldelay=[^\ ]*)?\](.*)\[\/mq\]/g,replaceMarquee);
 
-		// 메세지 안 디시콘 변환(시동어 ~ 입력후 등록한 이모티콘 이름 입력하면 됨)
-		if(window.config.allowDCCon) message = message.replace(/~([^\ ~]*)/g,replaceDCCon);
+        // 메세지 안 디시콘 변환(시동어 ~ 입력후 등록한 이모티콘 이름 입력하면 됨)
+        if(window.config.allowDCCon) message = message.replace(/~([^\ ~]*)/g,replaceDCCon);
 
-		//기본문법 변환
-		message = replaceStyle(message);
-	}
+        //기본문법 변환
+        message = replaceStyle(message);
+    }
 
     return addChatMessage2(platform, nickname, message);
 };
@@ -164,47 +164,47 @@ function htmlEntities(str) {
 
 // 디시콘 불러오기 초기화 함수
 function initChatInject() {
-	// httpRequest 초기화
-	if (window.XMLHttpRequest) { // 파폭, 사파리, 크롬 등등 웹표준 준수 브라우저
-      httpRequest = new XMLHttpRequest();
+    // httpRequest 초기화
+    if (window.XMLHttpRequest) { // 파폭, 사파리, 크롬 등등 웹표준 준수 브라우저
+        httpRequest = new XMLHttpRequest();
     } else if (window.ActiveXObject) { // 쓰레기 IE
-      try {
-        httpRequest = new ActiveXObject("Msxml2.XMLHTTP");
-      } 
-      catch (e) {
         try {
-          httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
-        } 
-        catch (e) {}
-      }
+            httpRequest = new ActiveXObject("Msxml2.XMLHTTP");
+        }
+        catch (e) {
+            try {
+                httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            catch (e) {}
+        }
     }
 
-	if (!httpRequest) {
-      alert('ERROR : Cannot init XMLHTTPRequest');
-      return false;
+    if (!httpRequest) {
+        alert('ERROR : Cannot init XMLHTTPRequest');
+        return false;
     }
 
-	httpRequest.onreadystatechange = LoadDCCon;
-	// !!! 아래 주소를 디시콘 JSON 파일 주소로 바꿔주세요 !!!
+    httpRequest.onreadystatechange = LoadDCCon;
+    // !!! 아래 주소를 디시콘 JSON 파일 주소로 바꿔주세요 !!!
     httpRequest.open('GET', "https://openrct2.lastorder.xyz/dccon/list.php");
     httpRequest.send();
 }
 
 // 디시콘 불러오기 완료 함수
 function LoadDCCon() {
-	if (httpRequest.readyState === 4) {
-		if (httpRequest.status === 200) {
-			try {
-				window.DCCon = JSON.parse(httpRequest.responseText);
-				window.isInited = true;
-			}
-			catch (e) {
-				alert("Unknown error occured while parsing DCCon JSON.");
-			}
-		} else {
-			alert("Unknown error occured while downloading DCCon JSON.");
-		}
-	}
+    if (httpRequest.readyState === 4) {
+        if (httpRequest.status === 200) {
+            try {
+                window.DCCon = JSON.parse(httpRequest.responseText);
+                window.isInited = true;
+            }
+            catch (e) {
+                alert("Unknown error occured while parsing DCCon JSON.");
+            }
+        } else {
+            alert("Unknown error occured while downloading DCCon JSON.");
+        }
+    }
 }
 
 initChatInject();
