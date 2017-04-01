@@ -180,7 +180,7 @@ function initChatInject() {
     }
 
     if (!httpRequest) {
-        alert('ERROR : Cannot init XMLHTTPRequest');
+        addChatMessage("tvpot","Chat Inject ERROR","Cannot init XMLHTTPRequest");
         return false;
     }
 
@@ -199,10 +199,10 @@ function LoadDCCon() {
                 window.isInited = true;
             }
             catch (e) {
-                alert("Unknown error occured while parsing DCCon JSON.");
+                addChatMessage("tvpot","Chat Inject ERROR","Unknown error occured while parsing DCCon JSON.");
             }
         } else {
-            alert("Unknown error occured while downloading DCCon JSON.");
+            addChatMessage("tvpot","Chat Inject ERROR","Unknown error occured while downloading DCCon JSON.");
         }
     }
 }
