@@ -31,7 +31,8 @@ function addChatMessage2(platform, nickname, message) {
     var chatMessage;
     var $chatElement;
 
-    chatNickname = "<span class='" + stylePlatform + "'" + style + "/><span class='chat_text_nickname' style='display:none'>" + nickname + "</span>";
+    if(platform == "error") chatNickname = "<span class='chat_error_icon'" + style + "/><span class='chat_text_nickname chat_error_nickname' style='display:none'>" + nickname + "</span>";
+    else chatNickname = "<span class='" + stylePlatform + "'" + style + "/><span class='chat_text_nickname' style='display:none'>" + nickname + "</span>";
     if(window.config.allowTag) msg = $("<div>" + message + "</div>").html();
     else  msg = $("<div>" + message + "</div>").text();
     if(platform == "error") chatMessage = "<div class='chat_text_message chat_error_message' style='display:none'>" + msg + "</div>";
