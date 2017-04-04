@@ -18,7 +18,6 @@ window.DCCon = {};
 // XMLHTTPRequest
 var httpRequest;
 
-// JSAssist 패치되서 HTML 선택허용 되면 아래 함수는 지워도됨
 function addChatMessage2(platform, nickname, message) {
     var style = "style='display:none; '";
     var stylePlatform = "chat_platform_";
@@ -35,7 +34,8 @@ function addChatMessage2(platform, nickname, message) {
     chatNickname = "<span class='" + stylePlatform + "'" + style + "/><span class='chat_text_nickname' style='display:none'>" + nickname + "</span>";
     if(window.config.allowTag) msg = $("<div>" + message + "</div>").html();
     else  msg = $("<div>" + message + "</div>").text();
-    chatMessage = "<div class='chat_text_message' style='display:none'>" + msg + "</div>";
+    if(platform == "error") chatMessage = "<div class='chat_text_message chat_error_message' style='display:none'>" + msg + "</div>";
+    else chatMessage = "<div class='chat_text_message' style='display:none'>" + msg + "</div>";
     $chatElement = $(chatNickname + chatMessage + "</div>");
 
     $chatElement.appendTo($(".chat_container"));
